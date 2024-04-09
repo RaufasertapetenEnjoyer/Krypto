@@ -47,8 +47,8 @@ public class Main {
     }
 
     public static void main(String[] args) {
-        char[] text = "Halloichbinmichael".toCharArray();
-        char[] key = "kleinermann".toCharArray();
+        char[] text = "Ichwillnichtmitihmtanzen".toCharArray();
+        char[] key = "key".toCharArray();
 
         System.out.print("Der zu verschlüssende Text lautet:    ");
         System.out.println(text);
