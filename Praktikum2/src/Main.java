@@ -1,6 +1,41 @@
-public class Main {
-    public static void main(String[] args) {
+import java.util.Arrays;
+import java.util.stream.Stream;
 
+public class Main {
+
+    private static final double friedLangDE = 0.0762;
+    private static final double friedRand = 0.0385;
+
+    public static void main(String[] args) {
+        char[] encodeText = "LWFCOSYJYWTWHRYKUGKLHLLOMGMXLPYNABVJJLAWTCVGALUTQBUXLQUKOVZCLRBSNSETPRYPMFDTLEOXSSJILPFLGBULHIBJQBUXJLBAQFJEYIWZQBRTOILLEWTWKMYKQOIBLIOFESITYBMLMRKVSEOTFAZGDIHFUQYTBGBKMUVLPVBSNSETPRYOUFBAPGBKOVNTYITWUHMDYYHKMPVGEAYFZKZGKELSGTMDYFYJQWKTAWYAZKFASIHXPOECTYYKESELPVTMQFJIBRMWDSRCNWNVMJFGEEVDQUVCPGBKFSYTOMYJVSKOAZIJQITWCSYDXWXPUKMLRFVXDMYKASKLHAYAXWTWHRYLIOJMNPUMNSLCKMBJZWTWARYAZWTWZXYZQVZTYSBFQOEVZXQWUZZROINOMGEXJLNNQFXTZWYFTOSTEMWZTOSTUMWZFJVGNIMKQBUPZWCUTBZROXBAQFSXUAYYQBUTZAYYQGUTYZIJYWIAPIALECESLVHPISXTUHYKISXTZHYJNSITPXMZUBKTYQCJXWVVAMWZTOSTUMWZFJVGNIMKQBUPZWQADPVGLMNKJGVXALOFPSIIQEBJQBXTNIHVUSJTTEMUTWETUOUWYDWTUMWZTOSTUMWZFJVGNIMKQBUPZWMAQLJTPXBMZRVGANUZDSEXOVYSDAVTUWWZUQBTUYGMZGQJGILKFCVGLROFPBRROICFQAAPOVBMZRVGABXWEYIXLKYKTOSTPGBFUQYICILYQGJTUAUKPOJLPGBLUUJILMMLIWIHPRXFAQYWPILDMGJIBRMPTSLILRUUTHUXLWYJMFDTLZIFTWVGHYMWUBVQVXMUTOWIZGBAOYVCSEMKFIEHOIOLQBRROXRVUSJTOSYZXSEOBQYJLWKILVHTDWEVLRBWGHVCHGBLISISLRQADRZTZIBSXZVCHYMWDRVMZXUZXIESZXYAZSIQLFYFXOJHLRMAQGFASIHMZGYDLVYFHCDGVXYFWSICIMMRGAJROAUJLSEMOMGEQZYTBXYFMQYIDILVQBNXYHUXGSIHVVAWZRRHZWCWZWVBHPMNQFXTZWYFPOJXZXTAABLCKBQADVRQLREWUBVPUKML".toCharArray();
+        double length = friedmannTest(encodeText.length, calculateFriedmannIndexForEncodedText(encodeText));
+        System.out.println(length);
+    }
+
+    public static int[] countOccurrencesOfAllCharacters(char[] encodedText){
+        int[] occurrences = new int[26];
+        for (int i = 'A'; i <= 'Z'; i++) {
+            for (char c : encodedText) {
+                if (c == (char) i) {
+                    occurrences[i - 'A']++;
+                }
+            }
+        }
+        return occurrences;
+    }
+
+    public static double calculateFriedmannIndexForEncodedText(char[] encodedText){
+        int[] occurrences = countOccurrencesOfAllCharacters(encodedText);
+        int sum = 0;
+        for (int occurrence : occurrences) {
+            sum += occurrence * (occurrence - 1);
+        }
+        return ((double) 1 / (encodedText.length * (encodedText.length - 1))) * sum;
+    }
+    public static double friedmannTest(int lengthEncodedText, double friedChiffre){
+        return lengthEncodedText * (friedLangDE - friedRand)
+                /
+                (friedChiffre * (lengthEncodedText - 1) + friedLangDE - (lengthEncodedText * friedRand));
     }
 
     public static char addChars(char uncryptedChar, char keyChar) {
