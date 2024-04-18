@@ -1,3 +1,5 @@
+package src;
+
 import java.util.Arrays;
 import java.util.stream.Stream;
 
@@ -47,6 +49,55 @@ public class Main {
         int numberToAdd = (uncryptedChar) - additionToAscii + keyChar - 97;
         return (char) ((numberToAdd % 26) + additionToAscii);
     }
+
+    public static char[] decode(char[] textToDecode, char[] key){
+        char[] array = new char[textToDecode.length];
+        for (int i = 0; i < textToDecode.length; i++) {
+            if(textToDecode[i] == ' '){
+                array[i] = ' ';
+                continue;
+            }
+            if(Character.isUpperCase(textToDecode[i])){
+                int number = (textToDecode[i] - 65) - (key[i % key.length] - 97);
+                array[i] = (char) (number + 65);
+                continue;
+            }
+            if(Character.isLowerCase(textToDecode[i])){
+                int number = (textToDecode[i] - 97) - (key[i % key.length] - 97);
+                if(number < 0){
+                    array[i] = (char) (number + 123);
+                }else {
+                    array[i] = (char) (number + 97);
+                }
+            }
+        }
+        return array;
+    }
+
+    public static int findDistances(char[] decryptedText) {
+        int distance = 0;
+        int length = 0;
+        char[] sequence;
+        for (int i = 0; i < decryptedText.length; i++) {
+            for (int j = 0; j < decryptedText.length; j++) {
+                if (j != i) {
+                    if (decryptedText[i] == decryptedText[j]) {
+                        length++;
+                        if(decryptedText[i+1] == decryptedText[j+1]){
+                            length++;
+                            if(decryptedText[i+2] == decryptedText[j+2]){
+                                length++;
+                                distance = j - i - 1;
+                                sequence = new char[length];
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return 0;
+    }
+
 }
 
 /** Text für 2.
