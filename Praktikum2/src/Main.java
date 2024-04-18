@@ -1,7 +1,4 @@
-package src;
-
-import java.util.Arrays;
-import java.util.stream.Stream;
+import java.util.*;
 
 public class Main {
 
@@ -11,7 +8,15 @@ public class Main {
     public static void main(String[] args) {
         char[] encodeText = "LWFCOSYJYWTWHRYKUGKLHLLOMGMXLPYNABVJJLAWTCVGALUTQBUXLQUKOVZCLRBSNSETPRYPMFDTLEOXSSJILPFLGBULHIBJQBUXJLBAQFJEYIWZQBRTOILLEWTWKMYKQOIBLIOFESITYBMLMRKVSEOTFAZGDIHFUQYTBGBKMUVLPVBSNSETPRYOUFBAPGBKOVNTYITWUHMDYYHKMPVGEAYFZKZGKELSGTMDYFYJQWKTAWYAZKFASIHXPOECTYYKESELPVTMQFJIBRMWDSRCNWNVMJFGEEVDQUVCPGBKFSYTOMYJVSKOAZIJQITWCSYDXWXPUKMLRFVXDMYKASKLHAYAXWTWHRYLIOJMNPUMNSLCKMBJZWTWARYAZWTWZXYZQVZTYSBFQOEVZXQWUZZROINOMGEXJLNNQFXTZWYFTOSTEMWZTOSTUMWZFJVGNIMKQBUPZWCUTBZROXBAQFSXUAYYQBUTZAYYQGUTYZIJYWIAPIALECESLVHPISXTUHYKISXTZHYJNSITPXMZUBKTYQCJXWVVAMWZTOSTUMWZFJVGNIMKQBUPZWQADPVGLMNKJGVXALOFPSIIQEBJQBXTNIHVUSJTTEMUTWETUOUWYDWTUMWZTOSTUMWZFJVGNIMKQBUPZWMAQLJTPXBMZRVGANUZDSEXOVYSDAVTUWWZUQBTUYGMZGQJGILKFCVGLROFPBRROICFQAAPOVBMZRVGABXWEYIXLKYKTOSTPGBFUQYICILYQGJTUAUKPOJLPGBLUUJILMMLIWIHPRXFAQYWPILDMGJIBRMPTSLILRUUTHUXLWYJMFDTLZIFTWVGHYMWUBVQVXMUTOWIZGBAOYVCSEMKFIEHOIOLQBRROXRVUSJTOSYZXSEOBQYJLWKILVHTDWEVLRBWGHVCHGBLISISLRQADRZTZIBSXZVCHYMWDRVMZXUZXIESZXYAZSIQLFYFXOJHLRMAQGFASIHMZGYDLVYFHCDGVXYFWSICIMMRGAJROAUJLSEMOMGEQZYTBXYFMQYIDILVQBNXYHUXGSIHVVAWZRRHZWCWZWVBHPMNQFXTZWYFPOJXZXTAABLCKBQADVRQLREWUBVPUKML".toCharArray();
         double length = friedmannTest(encodeText.length, calculateFriedmannIndexForEncodedText(encodeText));
-        System.out.println(length);
+        System.out.println("Die Länge des verschlüsselten Textes:   " + encodeText.length);
+        System.out.println("Das Ergebnis für die Länge ist:         " + length);
+
+        kasiskyTest(encodeText);
+
+        char[] text = "Ocs yif jcs Cvtirsfcv scvsf udscvsv bfivzesocoatsv Rif, jcs Oatstsfszijs tcsoo, jio scvzcks Deuid cv jsf Msjcvi, jio yistfsvj jsf kivzsv Viatx ebbsv yif. So yif mivatmid kivz dssf, mivatmid oioosv jfsc ejsf pcsf Dsgxs jifcv. Ysvv so irsf pedd yif, im tisgbckoxsv zycoatsv zysc gvj jfsc Gtf viatxo, tesfxs miv lsjso Yefx, jio jcs ivjsfsv Kisoxs oikxsv, gfj uim mcx lsjsm cvo Ksonfisat.".toCharArray();
+        int number = 8;
+        System.out.println(getKey(text, number));
+
     }
 
     public static int[] countOccurrencesOfAllCharacters(char[] encodedText){
@@ -38,6 +43,76 @@ public class Main {
         return lengthEncodedText * (friedLangDE - friedRand)
                 /
                 (friedChiffre * (lengthEncodedText - 1) + friedLangDE - (lengthEncodedText * friedRand));
+    }
+
+    public static List<Integer> kasiskyTest(char[] encodedText){
+        List<Integer> distanceList = getDistanceOfCommonWords(encodedText);
+        System.out.println("Die List an Abständen für Wörter mit einer länge von min. drei: " + distanceList);
+
+        Map<Integer, Integer> mapOccurrences = new HashMap<>();
+        for (int i = 0; i < distanceList.size(); i++) {
+            for (int j = i + 1; j < distanceList.size(); j++) {
+                Integer ggt = ggt(distanceList.get(i), distanceList.get(j));
+                if(!mapOccurrences.containsKey(ggt)){
+                    mapOccurrences.put(ggt, 1);
+                }else{
+                    mapOccurrences.put(ggt, mapOccurrences.get(ggt) + 1);
+                }
+            }
+        }
+
+        System.out.println("Die Map an ggTs von den Abständen lautet: " + mapOccurrences);
+
+        List<Integer> possibleLengths = new ArrayList<>();
+        List<Integer> values = new ArrayList<>(mapOccurrences.values());
+
+        values.sort(Collections.reverseOrder());
+
+        for (int i = 0; i < 3; i++) {
+            for (Integer key : mapOccurrences.keySet()){
+                if(values.get(i).equals(mapOccurrences.get(key)) && !possibleLengths.contains(key)){
+                    possibleLengths.add(key);
+                    break;
+                }
+            }
+        }
+        System.out.println(possibleLengths);
+        return possibleLengths;
+    }
+
+    private static List<Integer> getDistanceOfCommonWords(char[] encodedText) {
+        List<Integer> distanceList = new ArrayList<>();
+        for (int i = 0; i < encodedText.length; i++) {
+            for (int j = 0; j < encodedText.length; j++) {
+                if(j != i){
+                    if(encodedText[i] == encodedText[j]){
+                        int length = 0;
+                        while((i + length < encodedText.length && j + length < encodedText.length) && encodedText[i + length] == encodedText[j + length]){
+                            length++;
+                        }
+
+                        if(length > 3){
+                            Integer distance = (j >= i ? j - i : i - j);
+                            if(!distanceList.contains(distance)){
+                                distanceList.add(distance);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return distanceList;
+    }
+
+    private static int ggt(int zahl1, int zahl2) {
+        while (zahl2 != 0) {
+            if (zahl1 > zahl2) {
+                zahl1 = zahl1 - zahl2;
+            } else {
+                zahl2 = zahl2 - zahl1;
+            }
+        }
+        return zahl1;
     }
 
     public static char addChars(char uncryptedChar, char keyChar) {
@@ -74,54 +149,40 @@ public class Main {
         return array;
     }
 
-    public static int findDistances(char[] decryptedText) {
-        int distance = 0;
-        int length = 0;
-        char[] sequence;
-        for (int i = 0; i < decryptedText.length; i++) {
-            for (int j = 0; j < decryptedText.length; j++) {
-                if (j != i) {
-                    if (decryptedText[i] == decryptedText[j]) {
-                        length++;
-                        if(decryptedText[i+1] == decryptedText[j+1]){
-                            length++;
-                            if(decryptedText[i+2] == decryptedText[j+2]){
-                                length++;
-                                distance = j - i - 1;
-                                sequence = new char[length];
-                            }
-                        }
-                    }
-                }
+    public static char[] getKey(char[] encodedText, int length){
+        List<Character> charactersToAnalyze = new ArrayList<>();
+
+        for (int i = 0; i < encodedText.length; i+= length - 1) {
+            charactersToAnalyze.add(encodedText[i]);
+        }
+
+        char encodedWithE = frequencyAnalysisForLetterE(charactersToAnalyze);
+
+        System.out.println(encodedWithE);
+
+        return null;
+    }
+
+    public static char frequencyAnalysisForLetterE(List<Character> characters){
+        Map<Character, Integer> frequency = new HashMap<>();
+
+        for (Character c : characters){
+            if(!frequency.containsKey(c)){
+                frequency.put(c, 1);
+            }else {
+                frequency.put(c, frequency.get(c) + 1);
+            }
+        }
+
+        List<Integer> occurrences = new ArrayList<>(frequency.values());
+        occurrences.sort(Comparator.reverseOrder());
+        Integer highestOccurrence = occurrences.getFirst();
+
+        for (Character c : frequency.keySet()){
+            if (Objects.equals(frequency.get(c), highestOccurrence)){
+                return c;
             }
         }
         return 0;
     }
-
 }
-
-/** Text für 2.
- *   LWFCOSYJYWTWHRYKUGKLHLLOMGMXLPYNABVJJLAWTCVGALUTQ
- *   BUXLQUKOVZCLRBSNSETPRYPMFDTLEOXSSJILPFLGBULHIBJQBUXJL
- *   BAQFJEYIWZQBRTOILLEWTWKMYKQOIBLIOFESITYBMLMRKVSEOTF
- *   AZGDIHFUQYTBGBKMUVLPVBSNSETPRYOUFBAPGBKOVNTYITWUHM
- *   DYYHKMPVGEAYFZKZGKELSGTMDYFYJQWKTAWYAZKFASIHXPOECT
- *   YYKESELPVTMQFJIBRMWDSRCNWNVMJFGEEVDQUVCPGBKFSYTOM
- *   YJVSKOAZIJQITWCSYDXWXPUKMLRFVXDMYKASKLHAYAXWTWHRY
- *   LIOJMNPUMNSLCKMBJZWTWARYAZWTWZXYZQVZTYSBFQOEVZXQ
- *   WUZZROINOMGEXJLNNQFXTZWYFTOSTEMWZTOSTUMWZFJVGNIM
- *   KQBUPZWCUTBZROXBAQFSXUAYYQBUTZAYYQGUTYZIJYWIAPIALEC
- *   ESLVHPISXTUHYKISXTZHYJNSITPXMZUBKTYQCJXWVVAMWZTOST
- *   UMWZFJVGNIMKQBUPZWQADPVGLMNKJGVXALOFPSIIQEBJQBXTNIH
- *   VUSJTTEMUTWETUOUWYDWTUMWZTOSTUMWZFJVGNIMKQBUPZ
- *   WMAQLJTPXBMZRVGANUZDSEXOVYSDAVTUWWZUQBTUYGMZGQJ
- *   GILKFCVGLROFPBRROICFQAAPOVBMZRVGABXWEYIXLKYKTOSTPG
- *   BFUQYICILYQGJTUAUKPOJLPGBLUUJILMMLIWIHPRXFAQYWPILDMG
- *   JIBRMPTSLILRUUTHUXLWYJMFDTLZIFTWVGHYMWUBVQVXMUTOW
- *   IZGBAOYVCSEMKFIEHOIOLQBRROXRVUSJTOSYZXSEOBQYJLWKILV
- *   HTDWEVLRBWGHVCHGBLISISLRQADRZTZIBSXZVCHYMWDRVMZXU
- *   ZXIESZXYAZSIQLFYFXOJHLRMAQGFASIHMZGYDLVYFHCDGVXYFWS
- *   ICIMMRGAJROAUJLSEMOMGEQZYTBXYFMQYIDILVQBNXYHUXGSIHV
- *   VAWZRRHZWCWZWVBHPMNQFXTZWYFPOJXZXTAABLCKBQADVRQ
- *   LREWUBVPUKML
- */
