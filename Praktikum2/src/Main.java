@@ -1,4 +1,5 @@
 
+import javax.sound.midi.Soundbank;
 import java.util.*;
 
 
@@ -10,15 +11,43 @@ public class Main {
     public static void main(String[] args) {
         char[] encodeText = "LWFCOSYJYWTWHRYKUGKLHLLOMGMXLPYNABVJJLAWTCVGALUTQBUXLQUKOVZCLRBSNSETPRYPMFDTLEOXSSJILPFLGBULHIBJQBUXJLBAQFJEYIWZQBRTOILLEWTWKMYKQOIBLIOFESITYBMLMRKVSEOTFAZGDIHFUQYTBGBKMUVLPVBSNSETPRYOUFBAPGBKOVNTYITWUHMDYYHKMPVGEAYFZKZGKELSGTMDYFYJQWKTAWYAZKFASIHXPOECTYYKESELPVTMQFJIBRMWDSRCNWNVMJFGEEVDQUVCPGBKFSYTOMYJVSKOAZIJQITWCSYDXWXPUKMLRFVXDMYKASKLHAYAXWTWHRYLIOJMNPUMNSLCKMBJZWTWARYAZWTWZXYZQVZTYSBFQOEVZXQWUZZROINOMGEXJLNNQFXTZWYFTOSTEMWZTOSTUMWZFJVGNIMKQBUPZWCUTBZROXBAQFSXUAYYQBUTZAYYQGUTYZIJYWIAPIALECESLVHPISXTUHYKISXTZHYJNSITPXMZUBKTYQCJXWVVAMWZTOSTUMWZFJVGNIMKQBUPZWQADPVGLMNKJGVXALOFPSIIQEBJQBXTNIHVUSJTTEMUTWETUOUWYDWTUMWZTOSTUMWZFJVGNIMKQBUPZWMAQLJTPXBMZRVGANUZDSEXOVYSDAVTUWWZUQBTUYGMZGQJGILKFCVGLROFPBRROICFQAAPOVBMZRVGABXWEYIXLKYKTOSTPGBFUQYICILYQGJTUAUKPOJLPGBLUUJILMMLIWIHPRXFAQYWPILDMGJIBRMPTSLILRUUTHUXLWYJMFDTLZIFTWVGHYMWUBVQVXMUTOWIZGBAOYVCSEMKFIEHOIOLQBRROXRVUSJTOSYZXSEOBQYJLWKILVHTDWEVLRBWGHVCHGBLISISLRQADRZTZIBSXZVCHYMWDRVMZXUZXIESZXYAZSIQLFYFXOJHLRMAQGFASIHMZGYDLVYFHCDGVXYFWSICIMMRGAJROAUJLSEMOMGEQZYTBXYFMQYIDILVQBNXYHUXGSIHVVAWZRRHZWCWZWVBHPMNQFXTZWYFPOJXZXTAABLCKBQADVRQLREWUBVPUKML".toCharArray();
         double length = friedmannTest(encodeText.length, calculateFriedmannIndexForEncodedText(encodeText));
-        System.out.println("Die Länge des verschlüsselten Textes:   " + encodeText.length);
-        System.out.println("Das Ergebnis für die Länge ist:         " + length);
 
-        kasiskyTest(encodeText);
+        System.out.println("Das Ergebnis für die mögliche Länge, ermittelt mittels Friedmanntest, ist:         " + length);
 
-        char[] text = "Ocs yif jcs Cvtirsfcv scvsf udscvsv bfivzesocoatsv Rif, jcs Oatstsfszijs tcsoo, jio scvzcks Deuid cv jsf Msjcvi, jio yistfsvj jsf kivzsv Viatx ebbsv yif. So yif mivatmid kivz dssf, mivatmid oioosv jfsc ejsf pcsf Dsgxs jifcv. Ysvv so irsf pedd yif, im tisgbckoxsv zycoatsv zysc gvj jfsc Gtf viatxo, tesfxs miv lsjso Yefx, jio jcs ivjsfsv Kisoxs oikxsv, gfj uim mcx lsjsm cvo Ksonfisat.".toCharArray();
-        int number = 8;
-        char[] calculatedKey = getKey(encodeText, number);
+        List<Integer> possibleKeyLengths = kasiskyTest(encodeText);
+
+        System.out.println("Die drei längen mit der höchsten Häufigkeit: " + possibleKeyLengths.toString() + "\n");
+        System.out.println("Schritt 1: Alle längen testen");
+
+        for (int i = 0; i < possibleKeyLengths.size(); i++) {
+            char[] calculatedKey = getKey(encodeText, possibleKeyLengths.get(i));
+
+            System.out.println("Für Länge: " + possibleKeyLengths.get(i));
+            System.out.print("Der Key Lautet:");
+            System.out.println(calculatedKey);
+            System.out.print("Der entschlüsselte Text lautet: ");
+            System.out.println(decode(encodeText, calculatedKey));
+            System.out.println();
+        }
+        System.out.println("\nSchritt 2: Länge 8 passt am ehesten, aber der letzte Buchstabe ist falsch. Teste das Wort für alle möglichen Buchstabenfolgen");
+
+        char[] calculatedKey = getKey(encodeText, possibleKeyLengths.getFirst());
+        int index = 7;
+        Set<Character> possibleLetters = frequencyAnalysisForLetterESet(keyHelper(encodeText, index, 8));
+        for (Character c : possibleLetters) {
+            calculatedKey[index] = c;
+            System.out.print("Der Key Lautet:");
+            System.out.println(calculatedKey);
+            System.out.print("Der entschlüsselte Text lautet: ");
+            System.out.println(decode(encodeText, calculatedKey));
+            System.out.println();
+        }
+
+        System.out.println("\nSchritt 3: Der Buchstabe s passt am besten. Die finale Lösung lautet: ");
+        calculatedKey[7] = 's';
+        System.out.print("Der Key Lautet:");
         System.out.println(calculatedKey);
+        System.out.print("Der entschlüsselte Text lautet: ");
         System.out.println(decode(encodeText, calculatedKey));
     }
 
@@ -79,7 +108,6 @@ public class Main {
                 }
             }
         }
-        System.out.println(possibleLengths);
         return possibleLengths;
     }
 
@@ -126,8 +154,7 @@ public class Main {
                 continue;
             }
             int additionToAscii = Character.isUpperCase(textToDecode[i]) ? 65 : 97;
-            int number = 0;
-            number = (textToDecode[i] - additionToAscii) - (key[i % key.length] - 97);
+            int number = (textToDecode[i] - additionToAscii) - (key[i % key.length] - 97);
             if(number < 0){
                 array[i] = (char) (number + additionToAscii + 26);
             }else {
@@ -143,23 +170,29 @@ public class Main {
         }
         char[] key = new char[length];
         for (int i = 0; i < length; i++) {
-            List<Character> charactersToAnalyze = new ArrayList<>();
-
-            for (int j = i; j < encodedText.length; j += length) {
-                charactersToAnalyze.add(encodedText[j]);
-            }
-
-            char encodedWithE = frequencyAnalysisForLetterE(charactersToAnalyze);
-
-            System.out.println(encodedWithE);
-            int number = (encodedWithE - 65) - ('e' - 97);
-            if(number < 0){
-                key[i] = (char) (number + 123);
-            }else {
-                key[i] = (char) (number + 97);
-            }
+            key[i] = getKeyCharacterAtIndex(encodedText, i, length);
         }
         return key;
+    }
+
+    public static char getKeyCharacterAtIndex(char[] encodedText, int index, int length){
+        char encodedWithE = frequencyAnalysisForLetterE(keyHelper(encodedText, index, length));
+
+        int number = (encodedWithE - 65) - ('e' - 97);
+        if(number < 0){
+            return (char) (number + 123);
+        }else {
+            return (char) (number + 97);
+        }
+    }
+
+    public static List<Character> keyHelper(char[] encodedText, int index, int length){
+        List<Character> charactersToAnalyze = new ArrayList<>();
+
+        for (int j = index; j < encodedText.length; j += length) {
+            charactersToAnalyze.add(encodedText[j]);
+        }
+        return charactersToAnalyze;
     }
 
     public static char frequencyAnalysisForLetterE(List<Character> characters){
@@ -175,7 +208,6 @@ public class Main {
 
         List<Integer> occurrences = new ArrayList<>(frequency.values());
         occurrences.sort(Comparator.reverseOrder());
-        System.out.println(frequency);
         Integer highestOccurrence = occurrences.getFirst();
 
         for (Character c : frequency.keySet()){
@@ -183,6 +215,31 @@ public class Main {
                 return c;
             }
         }
+
         return 0;
+    }
+
+    public static Set<Character> frequencyAnalysisForLetterESet(List<Character> characters){
+        Map<Character, Integer> frequency = new HashMap<>();
+
+        for (Character c : characters){
+            if(!frequency.containsKey(c)){
+                frequency.put(c, 1);
+            }else {
+                frequency.put(c, frequency.get(c) + 1);
+            }
+        }
+
+        Set<Character> characterForKey = new HashSet<>();
+
+        for(Character encodedWithE : frequency.keySet()){
+            int number = (encodedWithE - 65) - ('e' - 97);
+            if(number < 0){
+                characterForKey.add ((char) (number + 123));
+            }else {
+                characterForKey.add ((char) (number + 97));
+            }
+        }
+        return characterForKey;
     }
 }
