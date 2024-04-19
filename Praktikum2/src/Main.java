@@ -1,4 +1,6 @@
+package src;
 import java.util.*;
+
 
 public class Main {
 
@@ -15,8 +17,9 @@ public class Main {
 
         char[] text = "Ocs yif jcs Cvtirsfcv scvsf udscvsv bfivzesocoatsv Rif, jcs Oatstsfszijs tcsoo, jio scvzcks Deuid cv jsf Msjcvi, jio yistfsvj jsf kivzsv Viatx ebbsv yif. So yif mivatmid kivz dssf, mivatmid oioosv jfsc ejsf pcsf Dsgxs jifcv. Ysvv so irsf pedd yif, im tisgbckoxsv zycoatsv zysc gvj jfsc Gtf viatxo, tesfxs miv lsjso Yefx, jio jcs ivjsfsv Kisoxs oikxsv, gfj uim mcx lsjsm cvo Ksonfisat.".toCharArray();
         int number = 8;
-        System.out.println(getKey(text, number));
-
+        char[] calculatedKey = getKey(encodeText, number);
+        System.out.println(calculatedKey);
+        System.out.println(decode(encodeText, calculatedKey));
     }
 
     public static int[] countOccurrencesOfAllCharacters(char[] encodedText){
@@ -132,35 +135,52 @@ public class Main {
                 array[i] = ' ';
                 continue;
             }
+            int number = 0;
             if(Character.isUpperCase(textToDecode[i])){
-                int number = (textToDecode[i] - 65) - (key[i % key.length] - 97);
-                array[i] = (char) (number + 65);
+                number = (textToDecode[i] - 65) - (key[i % key.length] - 97);
+                if(number < 0){
+                    array[i] = (char) (number + 91);
+                }else {
+                    array[i] = (char) (number + 65);
+                }
                 continue;
             }
             if(Character.isLowerCase(textToDecode[i])){
-                int number = (textToDecode[i] - 97) - (key[i % key.length] - 97);
+                number = (textToDecode[i] - 97) - (key[i % key.length] - 97);
                 if(number < 0){
                     array[i] = (char) (number + 123);
                 }else {
                     array[i] = (char) (number + 97);
                 }
+                continue;
             }
         }
         return array;
     }
 
     public static char[] getKey(char[] encodedText, int length){
-        List<Character> charactersToAnalyze = new ArrayList<>();
-
-        for (int i = 0; i < encodedText.length; i+= length - 1) {
-            charactersToAnalyze.add(encodedText[i]);
+        if (length == 0) {
+            return null;
         }
+        char[] key = new char[length];
+        for (int i = 0; i < length; i++) {
+            List<Character> charactersToAnalyze = new ArrayList<>();
 
-        char encodedWithE = frequencyAnalysisForLetterE(charactersToAnalyze);
+            for (int j = i; j < encodedText.length; j += length) {
+                charactersToAnalyze.add(encodedText[j]);
+            }
 
-        System.out.println(encodedWithE);
+            char encodedWithE = frequencyAnalysisForLetterE(charactersToAnalyze);
 
-        return null;
+            System.out.println(encodedWithE);
+            int number = (encodedWithE - 65) - ('e' - 97);
+            if(number < 0){
+                key[i] = (char) (number + 123);
+            }else {
+                key[i] = (char) (number + 97);
+            }
+        }
+        return key;
     }
 
     public static char frequencyAnalysisForLetterE(List<Character> characters){
@@ -176,6 +196,7 @@ public class Main {
 
         List<Integer> occurrences = new ArrayList<>(frequency.values());
         occurrences.sort(Comparator.reverseOrder());
+        System.out.println(frequency);
         Integer highestOccurrence = occurrences.getFirst();
 
         for (Character c : frequency.keySet()){
