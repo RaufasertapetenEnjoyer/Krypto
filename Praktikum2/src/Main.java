@@ -1,4 +1,4 @@
-package src;
+
 import java.util.*;
 
 
@@ -118,16 +118,6 @@ public class Main {
         return zahl1;
     }
 
-    public static char addChars(char uncryptedChar, char keyChar) {
-        if(uncryptedChar == ' '){
-            return uncryptedChar;
-        }
-
-        int additionToAscii = Character.isUpperCase(uncryptedChar) ? 65 : 97;
-        int numberToAdd = (uncryptedChar) - additionToAscii + keyChar - 97;
-        return (char) ((numberToAdd % 26) + additionToAscii);
-    }
-
     public static char[] decode(char[] textToDecode, char[] key){
         char[] array = new char[textToDecode.length];
         for (int i = 0; i < textToDecode.length; i++) {
@@ -135,24 +125,13 @@ public class Main {
                 array[i] = ' ';
                 continue;
             }
+            int additionToAscii = Character.isUpperCase(textToDecode[i]) ? 65 : 97;
             int number = 0;
-            if(Character.isUpperCase(textToDecode[i])){
-                number = (textToDecode[i] - 65) - (key[i % key.length] - 97);
-                if(number < 0){
-                    array[i] = (char) (number + 91);
-                }else {
-                    array[i] = (char) (number + 65);
-                }
-                continue;
-            }
-            if(Character.isLowerCase(textToDecode[i])){
-                number = (textToDecode[i] - 97) - (key[i % key.length] - 97);
-                if(number < 0){
-                    array[i] = (char) (number + 123);
-                }else {
-                    array[i] = (char) (number + 97);
-                }
-                continue;
+            number = (textToDecode[i] - additionToAscii) - (key[i % key.length] - 97);
+            if(number < 0){
+                array[i] = (char) (number + additionToAscii + 26);
+            }else {
+                array[i] = (char) (number + additionToAscii);
             }
         }
         return array;
