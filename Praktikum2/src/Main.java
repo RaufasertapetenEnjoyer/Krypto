@@ -1,5 +1,7 @@
 
 import javax.sound.midi.Soundbank;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.*;
 
 
@@ -23,34 +25,45 @@ public class Main {
             char[] calculatedKey = getKey(encodeText, possibleKeyLengths.get(i));
 
             System.out.println("Für Länge: " + possibleKeyLengths.get(i));
-            System.out.print("Der Key Lautet:");
-            System.out.println(calculatedKey);
-            System.out.print("Der entschlüsselte Text lautet: ");
-            System.out.println(decode(encodeText, calculatedKey));
-            System.out.println();
+            printKeyAndDecodedText(encodeText, calculatedKey);
         }
+
         System.out.println("\nSchritt 2: Länge 8 passt am ehesten, aber der letzte Buchstabe ist falsch. Teste das Wort für alle möglichen Buchstabenfolgen");
 
         char[] calculatedKey = getKey(encodeText, possibleKeyLengths.getFirst());
         int index = 7;
         Set<Character> possibleLetters = frequencyAnalysisForLetterESet(keyHelper(encodeText, index, 8));
+
         for (Character c : possibleLetters) {
             calculatedKey[index] = c;
-            System.out.print("Der Key Lautet:");
-            System.out.println(calculatedKey);
-            System.out.print("Der entschlüsselte Text lautet: ");
-            System.out.println(decode(encodeText, calculatedKey));
-            System.out.println();
+            printKeyAndDecodedText(encodeText, calculatedKey);
         }
 
         System.out.println("\nSchritt 3: Der Buchstabe s passt am besten. Die finale Lösung lautet: ");
         calculatedKey[7] = 's';
-        System.out.print("Der Key Lautet:");
-        System.out.println(calculatedKey);
-        System.out.print("Der entschlüsselte Text lautet: ");
-        System.out.println(decode(encodeText, calculatedKey));
+        printKeyAndDecodedText(encodeText, calculatedKey);
+
+        char[] decodedText = decode(encodeText, calculatedKey);
+        String filePath = "txt/decodedText.txt";
+        try{
+            FileWriter fileWriter = new FileWriter(filePath, false);
+            fileWriter.write("Der Key Lautet: ");
+            fileWriter.write(calculatedKey);
+            fileWriter.write("\nDer entschlüsselte Text lautet: ");
+            fileWriter.write(decodedText);
+            fileWriter.close();
+        }catch (IOException ex){
+            ex.printStackTrace();
+        }
     }
 
+    public static void printKeyAndDecodedText(char[] encodedText, char[] key){
+        System.out.print("Der Key Lautet:");
+        System.out.println(key);
+        System.out.print("Der entschlüsselte Text lautet: ");
+        System.out.println(decode(encodedText, key));
+        System.out.println();
+    }
     public static int[] countOccurrencesOfAllCharacters(char[] encodedText){
         int[] occurrences = new int[26];
         for (int i = 'A'; i <= 'Z'; i++) {
@@ -75,40 +88,6 @@ public class Main {
         return lengthEncodedText * (friedLangDE - friedRand)
                 /
                 (friedChiffre * (lengthEncodedText - 1) + friedLangDE - (lengthEncodedText * friedRand));
-    }
-
-    public static List<Integer> kasiskyTest(char[] encodedText){
-        List<Integer> distanceList = getDistanceOfCommonWords(encodedText);
-        System.out.println("Die List an Abständen für Wörter mit einer länge von min. drei: " + distanceList);
-
-        Map<Integer, Integer> mapOccurrences = new HashMap<>();
-        for (int i = 0; i < distanceList.size(); i++) {
-            for (int j = i + 1; j < distanceList.size(); j++) {
-                Integer ggt = ggt(distanceList.get(i), distanceList.get(j));
-                if(!mapOccurrences.containsKey(ggt)){
-                    mapOccurrences.put(ggt, 1);
-                }else{
-                    mapOccurrences.put(ggt, mapOccurrences.get(ggt) + 1);
-                }
-            }
-        }
-
-        System.out.println("Die Map an ggTs von den Abständen lautet: " + mapOccurrences);
-
-        List<Integer> possibleLengths = new ArrayList<>();
-        List<Integer> values = new ArrayList<>(mapOccurrences.values());
-
-        values.sort(Collections.reverseOrder());
-
-        for (int i = 0; i < 3; i++) {
-            for (Integer key : mapOccurrences.keySet()){
-                if(values.get(i).equals(mapOccurrences.get(key)) && !possibleLengths.contains(key)){
-                    possibleLengths.add(key);
-                    break;
-                }
-            }
-        }
-        return possibleLengths;
     }
 
     private static List<Integer> getDistanceOfCommonWords(char[] encodedText) {
@@ -146,22 +125,38 @@ public class Main {
         return zahl1;
     }
 
-    public static char[] decode(char[] textToDecode, char[] key){
-        char[] array = new char[textToDecode.length];
-        for (int i = 0; i < textToDecode.length; i++) {
-            if(textToDecode[i] == ' '){
-                array[i] = ' ';
-                continue;
-            }
-            int additionToAscii = Character.isUpperCase(textToDecode[i]) ? 65 : 97;
-            int number = (textToDecode[i] - additionToAscii) - (key[i % key.length] - 97);
-            if(number < 0){
-                array[i] = (char) (number + additionToAscii + 26);
-            }else {
-                array[i] = (char) (number + additionToAscii);
+    public static List<Integer> kasiskyTest(char[] encodedText){
+        List<Integer> distanceList = getDistanceOfCommonWords(encodedText);
+        System.out.println("Die List an Abständen für Wörter mit einer länge von min. drei: " + distanceList);
+
+        Map<Integer, Integer> mapOccurrences = new HashMap<>();
+        for (int i = 0; i < distanceList.size(); i++) {
+            for (int j = i + 1; j < distanceList.size(); j++) {
+                Integer ggt = ggt(distanceList.get(i), distanceList.get(j));
+                if(!mapOccurrences.containsKey(ggt)){
+                    mapOccurrences.put(ggt, 1);
+                }else{
+                    mapOccurrences.put(ggt, mapOccurrences.get(ggt) + 1);
+                }
             }
         }
-        return array;
+
+        System.out.println("Die Map an ggTs von den Abständen lautet: " + mapOccurrences);
+
+        List<Integer> possibleLengths = new ArrayList<>();
+        List<Integer> values = new ArrayList<>(mapOccurrences.values());
+
+        values.sort(Collections.reverseOrder());
+
+        for (int i = 0; i < 3; i++) {
+            for (Integer key : mapOccurrences.keySet()){
+                if(values.get(i).equals(mapOccurrences.get(key)) && !possibleLengths.contains(key)){
+                    possibleLengths.add(key);
+                    break;
+                }
+            }
+        }
+        return possibleLengths;
     }
 
     public static char[] getKey(char[] encodedText, int length){
@@ -241,5 +236,23 @@ public class Main {
             }
         }
         return characterForKey;
+    }
+
+    public static char[] decode(char[] textToDecode, char[] key){
+        char[] array = new char[textToDecode.length];
+        for (int i = 0; i < textToDecode.length; i++) {
+            if(textToDecode[i] == ' '){
+                array[i] = ' ';
+                continue;
+            }
+            int additionToAscii = Character.isUpperCase(textToDecode[i]) ? 65 : 97;
+            int number = (textToDecode[i] - additionToAscii) - (key[i % key.length] - 97);
+            if(number < 0){
+                array[i] = (char) (number + additionToAscii + 26);
+            }else {
+                array[i] = (char) (number + additionToAscii);
+            }
+        }
+        return array;
     }
 }
