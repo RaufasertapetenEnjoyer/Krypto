@@ -2,7 +2,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.math.BigInteger;
 
-public class Main {
+public class MainMichael {
     public static char[] hillChiffre(char[] textToDecode, char[][] key, boolean encode){
         if(!encode){
             key = inverseOf2x2mod26(key);
@@ -53,7 +53,7 @@ public class Main {
         }
         return inverse;
     }
-
+    
     public static void main(String[] args) {
         char[][] key = {
                 {6, 3},

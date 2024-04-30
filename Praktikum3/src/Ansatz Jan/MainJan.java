@@ -1,11 +1,18 @@
-public class Main {
+import java.math.BigInteger;
+
+public class MainJan {
     public static void main(String[] args) {
         char[] text = "KSEXZZGHETHFXTCKJWFRWDEBKTNQKTGUQNIECCQYYQIPYLDWLHUCJRZZFVSYKKGUSFRNKTGOTACCRZCUVOCKPIXTLHFRPDBNLHNNSTTPDJMGHXPPWDFSYOESXECUVOWSKXHHSPLTCUVOROJBPJANHFIIGOLHKSEXZZGHETHFXTCKJWHHUCAKCCEWCPCUVOGFMVCCRJMZYLPILHANGUSFZRIPJWLHCVVELHEBIRWSJRLHKEODGJLHKSXQPPWDJBMUYJIRCCQYKTCUCVGOHFCGVEAWETHFSPNVIALHYFCUPFDJTNXTWQEMZNLHKEODGJKGTCBXMBHFSRWSPCWLGOIPUIIHKRJWMRKXWSJRWSYLWQVIDJEBDMKRSYLHTQVVKTMZMVGGVOAWCDMZCIYHNDHZBTFFYOESIPATWSCPWDLUCDANCVAEHQXTMRJWXTICKEFSYQHFLHKSEXXTHXPPIPCPSZQOQMXTYQQYIVJWKSXQIAGOMBHFINAJHFWLSFLH".toCharArray();
         int[][] key = {{6, 3}, {5, 3}};
         int[][] invertedKey = {{1, 25}, {7, 2}};
-        System.out.println(hillTwo(text, invertedKey));
+        int[][] invertedKeyAuto = inverseOf2x2mod26(key);
+        System.out.print("Decrypted: ");
+        System.out.print(hillTwo(text, invertedKeyAuto));
+        System.out.println("\n");
         String text1 = "Schwarze Löcher im Universum sind Orte der Extreme. Die Masse ist in ihnen so stark zusammengepresst, dass nichts ihrer enorm hohen Anziehungskraft entkommt – nicht einmal Licht. Die Objekte selbst sind unsichtbar. Sie verraten sich jedoch über die Materie, die sie verschlucken: Fällt Materie in ein Schwarzes Loch, heizt sie sich auf Millionen Grad auf und strahlt dann hell. Dieses charakteristische Leuchten können Teleskope registrieren. Supermassereiche Schwarze Löcher erreichen durchaus die millionen-bis milliardenfache Masse unserer Sonne. Genau darum handelt es sich den Forschern zu folge bei den entdeckten kleinen roten Punkten – allerdings sind sie noch nicht unverhältnismäßig groß.";
-        System.out.println(hillTwo(cutString(text1).toCharArray(), key));
+        System.out.print("Encrypted: ");
+        System.out.print(hillTwo(cutString(text1).toCharArray(), key));
+        System.out.println("\n");
     }
 
     public static char[] hillTwo (char[] text, int[][] key) {
@@ -33,11 +40,31 @@ public class Main {
         return result;
     }
 
-    public static int[][] invertMatrixMod26(int[][] matrix) {
-        int[][] unitMatrix = {{1, 0}, {0, 1}};
-        int[] result = new int[2];
+    public static int[][] inverseOf2x2mod26(int[][] key){
+        BigInteger[][] numbers = new BigInteger[2][2];
+        BigInteger a = BigInteger.valueOf(key[0][0]);
+        BigInteger b = BigInteger.valueOf(key[0][1]);
+        BigInteger c = BigInteger.valueOf(key[1][0]);
+        BigInteger d = BigInteger.valueOf(key[1][1]);
+        BigInteger modul = BigInteger.valueOf(26);
 
-        return unitMatrix;
+        numbers[0][0] = d;
+        numbers[1][1] = a;
+        numbers[0][1] = b.negate();
+        numbers[1][0] = c.negate();
+
+        BigInteger denumerator = a.multiply(d).subtract(b.multiply(c));
+
+        int[][] inverse = new int[2][2];
+        for (int i = 0; i < 2; i++) {
+            for (int j = 0; j < 2; j++) {
+                inverse[i][j] = (int) numbers[i][j].mod(modul)
+                        .multiply(denumerator.modInverse(modul))
+                        .mod(modul)
+                        .intValue();
+            }
+        }
+        return inverse;
     }
 
     public static String cutString(String text) {
@@ -49,7 +76,6 @@ public class Main {
         text = text.replaceAll("ä","a");
         text = text.replaceAll("ö","o");
         text = text.replaceAll("ü","u");
-        System.out.println(text);
         return text;
     }
 }
