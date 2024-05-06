@@ -21,42 +21,32 @@ public class VigenereCipher extends AbstractPolyalphabeticalCipher implements Is
                 encodedText[i] = ' ';
                 continue;
             }
-            if(Character.isUpperCase(getText()[i])){
-                int numberToAdd = (getText()[i]) - 65 + key[i % key.length] - 97;
-                encodedText[i] = (char) ((numberToAdd % 26) + 65);
-                continue;
-            }
 
-            if(Character.isLowerCase(getText()[i])){
-                int number = (getText()[i]) - 97 + key[i % key.length] - 97;
-                encodedText[i] = (char) ((number % 26) + 97);
-            }
+            boolean keyUpper = Character.isUpperCase(getText()[i]);
+            int numberToAdd = (getText()[i]) - (keyUpper ? 65 : 97) + key[i % key.length] - 97;
+            encodedText[i] = (char) ((numberToAdd % 26) + (keyUpper ? 65 : 97));
+
         }
         return encodedText;
     }
 
     @Override
     public char[] decode() {
-        char[] array = new char[getText().length];
+        char[] decodedText = new char[getText().length];
         for (int i = 0; i < getText().length; i++) {
             if(getText()[i] == ' '){
-                array[i] = ' ';
+                decodedText[i] = ' ';
                 continue;
             }
-            if(Character.isUpperCase(getText()[i])){
-                int number = (getText()[i] - 65) - (key[i % key.length] - 97);
-                array[i] = (char) (number + 65);
-                continue;
-            }
-            if(Character.isLowerCase(getText()[i])){
-                int number = (getText()[i] - 97) - (key[i % key.length] - 97);
-                if(number < 0){
-                    array[i] = (char) (number + 123);
-                }else {
-                    array[i] = (char) (number + 97);
-                }
+
+            boolean isUpper = Character.isUpperCase(getText()[i]);
+            int number = (getText()[i] - (isUpper ? 65 : 97)) - (key[i % key.length] - 97);
+            if(number < 0){
+                decodedText[i] = (char) (number + (isUpper ? 91 : 123));
+            }else {
+                decodedText[i] = (char) (number + (isUpper ? 65 : 97));
             }
         }
-        return array;
+        return decodedText;
     }
 }
