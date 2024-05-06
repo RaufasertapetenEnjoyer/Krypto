@@ -40,7 +40,7 @@ public class VigenereCipher extends AbstractPolyalphabeticalCipher implements Is
             }
 
             boolean isUpper = Character.isUpperCase(getText()[i]);
-            int number = (getText()[i] - (isUpper ? 65 : 97)) - (key[i % key.length] - 97);
+            int number = (getText()[i] - (isUpper ? 65 : 97)) - ( Character.isUpperCase(key[i % key.length]) ? (key[i % key.length] - 65) : (key[i % key.length] - 97));
             if(number < 0){
                 decodedText[i] = (char) (number + (isUpper ? 91 : 123));
             }else {
