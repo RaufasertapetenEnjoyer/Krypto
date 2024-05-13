@@ -137,6 +137,8 @@ public class CipherUtil {
     }
 
     public static char[][] charArrTo2x2Matrix(char[] key) {
-        return new char[][]{{key[0], key[1]}, {key[2], key[3]}};
+        return new char[][]{
+                {(char)(key[0] - '0'), (char)(key[1] - '0')},
+                {(char)(key[2] - '0'), (char)(key[3] - '0')}};
     }
 }

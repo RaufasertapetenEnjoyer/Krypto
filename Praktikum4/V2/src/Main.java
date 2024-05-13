@@ -6,10 +6,10 @@ public class Main {
         char[] key1 = "key".toCharArray();
         char[] text1 = "Ichwillnichtmitihmtanzen".toCharArray();
         System.out.println(text1);
-        AbstractCipherActor encoder1 = builder.build(key1, text1, false, CipherUtil.CAESAR_CIPHER);
+        AbstractCipherActor encoder1 = builder.build(key1, text1, false, CipherUtil.VIGENERE_CIPHER);
         char[] cryptext1 = encoder1.action();
         System.out.println(cryptext1);
-        AbstractCipherActor decoder1 = builder.build(key1, cryptext1, true, CipherUtil.CAESAR_CIPHER);
+        AbstractCipherActor decoder1 = builder.build(key1, cryptext1, true, CipherUtil.VIGENERE_CIPHER);
         System.out.println(decoder1.action());
 
         char[] key2 = "x".toCharArray();
@@ -22,12 +22,12 @@ public class Main {
         System.out.println(decoder2.action());
 
         char[] key3 = "6353".toCharArray();
-        char[] text3 = "Die Macht ist keine Fähigkeit, die man besitzt. Es geht nicht darum, Steine hoch zu heben. Es ist ein Energiefeld zwischen allen Dingen - eine Spannung, oder ein Gleichgewicht, dass die Galaxis zusammen hält.".toCharArray();
+        char[] text3 = "KSEXZZGHETHFXTCKJWFRWDEBKTNQKTGUQNIECCQYYQIPYLDWLHUCJRZZFVSYKKGUSFRNKTGOTACCRZCUVOCKPIXTLHFRPDBNLHNNSTTPDJMGHXPPWDFSYOESXECUVOWSKXHHSPLTCUVOROJBPJANHFIIGOLHKSEXZZGHETHFXTCKJWHHUCAKCCEWCPCUVOGFMVCCRJMZYLPILHANGUSFZRIPJWLHCVVELHEBIRWSJRLHKEODGJLHKSXQPPWDJBMUYJIRCCQYKTCUCVGOHFCGVEAWETHFSPNVIALHYFCUPFDJTNXTWQEMZNLHKEODGJKGTCBXMBHFSRWSPCWLGOIPUIIHKRJWMRKXWSJRWSYLWQVIDJEBDMKRSYLHTQVVKTMZMVGGVOAWCDMZCIYHNDHZBTFFYOESIPATWSCPWDLUCDANCVAEHQXTMRJWXTICKEFSYQHFLHKSEXXTHXPPIPCPSZQOQMXTYQQYIVJWKSXQIAGOMBHFINAJHFWLSFLH".toCharArray();
         System.out.println(text3);
-        AbstractCipherActor encoder3 = builder.build(key3, text3, false, CipherUtil.CAESAR_CIPHER);
+        AbstractCipherActor encoder3 = builder.build(key3, text3, true, CipherUtil.HILL_CIPHER);
         char[] cryptext3 = encoder3.action();
         System.out.println(cryptext3);
-        AbstractCipherActor decoder3 = builder.build(key3, cryptext3, true, CipherUtil.CAESAR_CIPHER);
+        AbstractCipherActor decoder3 = builder.build(key3, cryptext3, false, CipherUtil.HILL_CIPHER);
         System.out.println(decoder3.action());
     }
 }
