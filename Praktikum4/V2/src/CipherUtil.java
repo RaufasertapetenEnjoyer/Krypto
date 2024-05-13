@@ -141,4 +141,23 @@ public class CipherUtil {
                 {(char)(key[0] - '0'), (char)(key[1] - '0')},
                 {(char)(key[2] - '0'), (char)(key[3] - '0')}};
     }
+
+    public static char[] cutCharArrToOnlyLetters(char[] text) {
+        String textString = Arrays.toString(text);
+        textString = textString.replaceAll("ä", "ae");
+        textString = textString.replaceAll("Ä", "Ae");
+        textString = textString.replaceAll("ö", "oe");
+        textString = textString.replaceAll("Ö", "Oe");
+        textString = textString.replaceAll("ü", "ue");
+        textString = textString.replaceAll("Ü", "Ue");
+        textString = textString.replaceAll("\\W", "");
+        textString = textString.replaceAll("[0-9]", "");
+        return textString.toCharArray();
+    }
+
+    public static char[] charArrToUpperCase(char[] text) {
+        String textString = Arrays.toString(text);
+        textString = textString.toUpperCase();
+        return textString.toCharArray();
+    }
 }
