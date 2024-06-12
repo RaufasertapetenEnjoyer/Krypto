@@ -53,23 +53,32 @@ public class Polynomial {
         for (int i = polynom.size()-1; i >= 0; i--) {
             if (polynom.get(i) != 0) {
                 builder.append(!builder.isEmpty() ? " + " : "");
-                /* hübschere Ausgabe ohne 1*/
-//                if (polynom.get(i) == -1) {
-//                    builder.append("-");
-//                } else if (polynom.get(i) != 1 || i == 0) {
-//                    builder.append(polynom.get(i));
-//                }
                 builder.append(polynom.get(i));
-                if (i != 0 ) {
-                    builder.append("x");
-//                    builder.append(i > 1 ? ("^" + i) : ""); // hübschere Ausgabe
-                    builder.append("^" + i);
-                }
+                builder.append(i != 0 ? ("x^" + i) : "");
             }
         }
         String result = builder.toString();
         return result.isEmpty() ? "" : result;
     }
 
-
+    public String toStringAdvanced() {
+        StringBuilder builder = new StringBuilder();
+        for (int i = polynom.size()-1; i >= 0; i--) {
+            if (polynom.get(i) != 0) {
+                builder.append(!builder.isEmpty() ? " + " : "");
+                if (polynom.get(i) == -1) {
+                    builder.append("-");
+                } else if (polynom.get(i) != 1 || i == 0) {
+                    builder.append(polynom.get(i));
+                }
+                builder.append(polynom.get(i));
+                if (i != 0 ) {
+                    builder.append("x");
+                    builder.append(i > 1 ? ("^" + i) : ""); // hübschere Ausgabe
+                }
+            }
+        }
+        String result = builder.toString();
+        return result.isEmpty() ? "0" : result;
+    }
 }
