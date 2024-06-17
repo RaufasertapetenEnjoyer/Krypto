@@ -35,7 +35,6 @@ public class Polynomial {
         int resultDegree = dividendDegree - divisorDegree;
         Integer[] integerPolynomArr = new Integer[resultDegree+1];
 
-        System.out.println("start");
         for(int i = dividendDegree; i >= dividendDegree-resultDegree; i--) {
             int a = Math.round((float)dividendPolynom.get(i) / divisorPolynom.get(divisorDegree));
             integerPolynomArr[i-divisorDegree] = a;
@@ -55,6 +54,8 @@ public class Polynomial {
                 builder.append(!builder.isEmpty() ? " + " : "");
                 builder.append(polynom.get(i));
                 builder.append(i != 0 ? ("x^" + i) : "");
+            } else if (polynom.get(i) == 0 && i == 0) {
+                builder.append(!builder.isEmpty() ? (" + " + polynom.get(i)) : "");
             }
         }
         String result = builder.toString();
