@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -19,7 +20,7 @@ public class Polynomial {
     public Polynomial[] divide(Polynomial divisor) throws IllegalArgumentException{
         List<Integer> divisorPolynom = divisor.polynom;
         int divisorDegree = divisorPolynom.size()-1;
-        List<Integer> dividendPolynom = this.polynom;
+        List<Integer> dividendPolynom = new ArrayList<>(this.polynom);
         int dividendDegree = dividendPolynom.size()-1;
         boolean isZero = true;
         for (Integer factor : divisorPolynom) {
@@ -49,13 +50,13 @@ public class Polynomial {
 
     public String toString() {
         StringBuilder builder = new StringBuilder();
+        boolean leadingZero = true;
         for (int i = polynom.size()-1; i >= 0; i--) {
-            if (polynom.get(i) != 0) {
+            leadingZero = polynom.get(i) == 0 && leadingZero;
+            if (!leadingZero){
                 builder.append(!builder.isEmpty() ? " + " : "");
                 builder.append(polynom.get(i));
                 builder.append(i != 0 ? ("x^" + i) : "");
-            } else if (polynom.get(i) == 0 && i == 0) {
-                builder.append(!builder.isEmpty() ? (" + " + polynom.get(i)) : "");
             }
         }
         String result = builder.toString();
@@ -75,11 +76,19 @@ public class Polynomial {
                 builder.append(polynom.get(i));
                 if (i != 0 ) {
                     builder.append("x");
-                    builder.append(i > 1 ? ("^" + i) : ""); // hübschere Ausgabe
+                    builder.append(i > 1 ? ("^" + i) : "");
                 }
             }
         }
         String result = builder.toString();
         return result.isEmpty() ? "0" : result;
+    }
+
+    public static Polynomial transformToBinary(Polynomial p) {
+        List<Integer> result = new ArrayList<>();
+        for (Integer element : p.polynom) {
+            result.add(Math.abs(element) % 2);
+        }
+        return new Polynomial(result);
     }
 }
